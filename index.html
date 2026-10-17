@@ -1,26 +1,151 @@
-<html>
-
+<!doctype html>
+<html lang="en">
 <head>
-    <title>Learning AWS</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        .titlebar {
-            background-color: #6298e0;
-            text-align: center;
-            padding: 5px;
-            color: white;
-            font-family: Arial, Helvetica, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4ecf7">
+  <title>DevOps.exe | AWS Workshop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --desktop: #f4ecf7;
+      --lilac: #b39ddb;
+      --lavender: #f3e5f5;
+      --purple: #4a148c;
+      --ink: #542a73;
+      --pink: #f48fb1;
+      --border: 3px solid var(--lilac);
+    }
 
-    </style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 36px 24px 94px;
+      color: var(--ink);
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--desktop);
+      background-image: radial-gradient(#e1bee7 1.5px, transparent 1.5px);
+      background-size: 16px 16px;
+    }
+    .workspace { width: min(100%, 880px); margin: 0 auto; }
+    .desktop-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      font: 23px/1 'VT323', monospace;
+      color: var(--purple);
+      text-shadow: 1px 1px #fff;
+    }
+    .desktop-label .folder { font-size: 27px; margin-right: 7px; }
+    .desktop-label small { font: 18px 'VT323', monospace; }
+    .window-shell { filter: drop-shadow(7px 7px 0 rgba(179,157,219,.45)); }
+    .window, .pixel-card, .logo-frame {
+      clip-path: polygon(8px 0, calc(100% - 8px) 0, calc(100% - 8px) 4px,
+        calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px,
+        100% calc(100% - 8px), calc(100% - 4px) calc(100% - 8px),
+        calc(100% - 4px) calc(100% - 4px), calc(100% - 8px) calc(100% - 4px),
+        calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 4px),
+        4px calc(100% - 4px), 4px calc(100% - 8px), 0 calc(100% - 8px),
+        0 8px, 4px 8px, 4px 4px, 8px 4px);
+    }
+    .window { border: var(--border); background: white; }
+    .window-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; min-height: 49px; padding: 7px 16px;
+      background: var(--lavender); border-bottom: var(--border);
+    }
+    .window-name { display: flex; align-items: center; gap: 9px; font: 23px 'VT323', monospace; color: var(--purple); }
+    .file-icon { display: grid; place-items: center; width: 22px; height: 22px; color: white; background: var(--lilac); border: 2px solid var(--purple); font: 18px 'VT323', monospace; }
+    .window-controls { display: flex; gap: 7px; }
+    .window-controls span { width: 23px; height: 22px; display: grid; place-items: center; border: 2px solid var(--lilac); background: white; font: 18px/1 monospace; color: var(--purple); }
+    .window-body { padding: 32px 38px 30px; }
+    .breadcrumbs { color: #9373b4; font: 19px 'VT323', monospace; margin-bottom: 30px; }
+    .breadcrumbs b { font-weight: normal; color: var(--purple); }
+    .badge { display: inline-block; background: #fce0ec; border: 2px solid #e7a1c2; padding: 5px 11px 3px; color: #a73f74; font: 19px 'VT323', monospace; letter-spacing: .7px; }
+    .hero { text-align: center; }
+    .hero h2 { margin: 23px 0 14px; color: var(--purple); font: normal clamp(32px, 5vw, 47px)/1 'VT323', monospace; }
+    .logo-frame { display: inline-grid; place-items: center; padding: 19px 30px; min-height: 106px; background: #faf6fc; border: var(--border); }
+    .logo-frame img { display: block; width: min(265px, 65vw); height: auto; max-height: 115px; object-fit: contain; }
+    .label { font: 20px 'VT323', monospace; letter-spacing: 1.5px; color: #9777af; }
+    .hero .label { margin: 31px 0 9px; }
+    h1 { margin: 0 auto; max-width: 690px; color: var(--purple); font: normal clamp(29px, 4.7vw, 45px)/1.09 'VT323', monospace; }
+    h1 strong { font-weight: normal; }
+    .intro { margin: 16px auto 0; max-width: 510px; color: #81638f; font-size: 13px; line-height: 1.7; }
+    .separator { margin: 34px 0 26px; border: 0; border-top: 2px dashed #d9c1e6; }
+    .pipeline-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .pipeline-title h3 { margin: 0; color: var(--purple); font: normal 25px 'VT323', monospace; }
+    .pipeline-title small { color: #9478aa; font: 18px 'VT323', monospace; }
+    .flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .pixel-card { min-width: 0; border: 2px solid var(--lilac); background: #fbf8fd; padding: 16px 13px 14px; }
+    .pixel-card .number { font: 18px 'VT323', monospace; color: #a787bc; }
+    .pixel-card h4 { margin: 9px 0 5px; font: normal 27px 'VT323', monospace; color: var(--purple); }
+    .pixel-card p { margin: 0; font-size: 12px; line-height: 1.5; color: #80628f; }
+    .window-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 28px; font: 18px 'VT323', monospace; color: #9677b2; }
+    .taskbar {
+      position: fixed; bottom: 0; left: 0; right: 0; min-height: 61px;
+      display: flex; align-items: center; gap: 12px; padding: 7px 18px;
+      background: var(--lavender); border-top: 4px solid var(--lilac);
+      box-shadow: 0 -4px 0 rgba(179,157,219,.25);
+      font: 22px 'VT323', monospace; color: var(--purple);
+    }
+    .start { padding: 6px 17px 4px; color: white; background: var(--pink); border: 3px solid #d81b60; box-shadow: 3px 3px 0 #ce93d8; }
+    .tab { background: white; border: 2px solid var(--lilac); padding: 5px 13px 3px; }
+    .tray { margin-left: auto; color: #754e98; font-size: 19px; white-space: nowrap; }
+    .screen-overlay { position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: .2; background: repeating-linear-gradient(transparent 0 3px, rgba(85,35,115,.12) 3px 4px); }
+    @media (max-width: 600px) {
+      body { padding: 18px 12px 88px; }
+      .desktop-label { font-size: 19px; }
+      .desktop-label small { font-size: 16px; }
+      .window-bar { padding-inline: 10px; }
+      .window-body { padding: 25px 17px 23px; }
+      .breadcrumbs { margin-bottom: 21px; }
+      .flow { grid-template-columns: 1fr; gap: 9px; }
+      .pixel-card { padding: 12px 14px; }
+      .pixel-card h4 { margin: 2px 0; }
+      .window-controls span { width: 20px; height: 20px; }
+      .tab { display: none; }
+      .taskbar { padding-inline: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+  </style>
 </head>
-
 <body>
-    <div class="titlebar">
-        <h1>Learning DevOps in</h1> <img src="AWS_logo.png" /><br />
-	<h1><strong>Executing v1 on AWS Fargate</strong></h1>
-
+  <main class="workspace">
+    <div class="desktop-label"><span><span class="folder" aria-hidden="true">▣</span> DESKTOP / AWS WORKSHOP</span><small>PIXEL OS / 02</small></div>
+    <div class="window-shell">
+      <section class="window" aria-labelledby="app-title">
+        <header class="window-bar">
+          <div class="window-name"><span class="file-icon" aria-hidden="true">&gt;</span> DEVOPS.EXE</div>
+          <div class="window-controls" aria-hidden="true"><span>_</span><span>□</span><span>×</span></div>
+        </header>
+        <div class="window-body">
+          <div class="breadcrumbs">C:\WORKSHOP &gt; DEVOPS &gt; <b>FARGATE</b></div>
+          <div class="hero">
+            <span class="badge">* DEPLOYMENT / VERSION 02 *</span>
+            <h2>Learning DevOps in</h2>
+            <div class="logo-frame"><img src="AWS_logo.png" alt="AWS logo"></div>
+            <p class="label">// APPLICATION OUTPUT</p>
+            <h1 id="app-title"><strong>Executing v2 on AWS Fargate. Courtesy of Code Suite!</strong></h1>
+            <p class="intro">A small web app delivered through a CI/CD pipeline with AWS CodeBuild, Amazon ECR, and Amazon ECS.</p>
+          </div>
+          <hr class="separator">
+          <div class="pipeline-title"><h3>PIPELINE.EXE</h3><small>HOW IT WORKS</small></div>
+          <div class="flow" aria-label="CI/CD pipeline stages">
+            <div class="pixel-card"><span class="number">01 / SOURCE</span><h4>GitHub</h4><p>Push the application code.</p></div>
+            <div class="pixel-card"><span class="number">02 / BUILD</span><h4>CodeBuild</h4><p>Build and publish the image.</p></div>
+            <div class="pixel-card"><span class="number">03 / DEPLOY</span><h4>Fargate</h4><p>Run the updated container.</p></div>
+          </div>
+          <div class="window-footer"><span>FILE: INDEX.HTML</span><span>PLATFORM: AWS ECS / FARGATE</span></div>
+        </div>
+      </section>
     </div>
+  </main>
+  <footer class="taskbar" aria-label="Pixel OS taskbar"><span class="start">START</span><span class="tab">▣ DEVOPS.EXE</span><span class="tray">AWS WORKSHOP | V2</span></footer>
+  <div class="screen-overlay" aria-hidden="true"></div>
 </body>
-
 </html>
